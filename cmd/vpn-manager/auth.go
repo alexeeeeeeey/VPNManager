@@ -43,6 +43,10 @@ func authentication(cfg config) func(http.Handler) http.Handler {
 	}
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodGet && r.URL.Path == "/favicon.svg" {
+				next.ServeHTTP(w, r)
+				return
+			}
 			if cfg.Development {
 				if r.URL.Path == "/login" || r.URL.Path == "/logout" {
 					http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -143,9 +147,9 @@ func loginPage(w http.ResponseWriter, status int, message string) {
 	const themeScript = `try{const old=localStorage.getItem('vpn-manager-accent');const color=localStorage.getItem('vpn-manager-theme')||(old==='#baf5a7'?'':old);if(/^#[0-9a-f]{6}$/i.test(color||''))document.documentElement.style.setProperty('--accent',color)}catch{}`
 	hash := sha256.Sum256([]byte(themeScript))
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.Header().Set("Content-Security-Policy", "default-src 'none'; script-src 'sha256-"+base64.StdEncoding.EncodeToString(hash[:])+"'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
+	w.Header().Set("Content-Security-Policy", "default-src 'none'; img-src 'self'; script-src 'sha256-"+base64.StdEncoding.EncodeToString(hash[:])+"'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'")
 	w.WriteHeader(status)
-	_, _ = io.WriteString(w, `<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вход · VPN Manager</title><script>`+themeScript+`</script>
+	_, _ = io.WriteString(w, `<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Manager</title><script>`+themeScript+`</script>
 <style>
 :root{color-scheme:dark;--accent:#ffffff;--surface:color-mix(in srgb,#070707,var(--accent) 10%);--edge:color-mix(in srgb,#161616,var(--accent) 17%);--muted:color-mix(in srgb,#a3a3a3,var(--accent) 22%);--background:color-mix(in srgb,#040404,var(--accent) 7%)}
 *{box-sizing:border-box}body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:1rem;background:var(--background);color:#eef3ef;font:1rem Inter,"Segoe UI",system-ui,sans-serif}

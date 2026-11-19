@@ -349,6 +349,15 @@ type ZapretStatus struct {
 	UpdateAvailable bool    `json:"updateAvailable"`
 }
 
+// ZapretStrategies defines model for ZapretStrategies.
+type ZapretStrategies = []ZapretStrategy
+
+// ZapretStrategy defines model for ZapretStrategy.
+type ZapretStrategy struct {
+	Args []string `json:"args"`
+	Name string   `json:"name"`
+}
+
 // ZapretTrial defines model for ZapretTrial.
 type ZapretTrial struct {
 	Args     []string `json:"args"`
@@ -359,7 +368,8 @@ type ZapretTrial struct {
 
 // ZapretTuneInput defines model for ZapretTuneInput.
 type ZapretTuneInput struct {
-	Targets []string `json:"targets"`
+	Candidates *ZapretStrategies `json:"candidates,omitempty"`
+	Targets    []string          `json:"targets"`
 }
 
 // ZapretTuneResult defines model for ZapretTuneResult.
@@ -400,6 +410,9 @@ type ManageZapretJSONRequestBody = ZapretAction
 
 // ProbeZapretJSONRequestBody defines body for ProbeZapret for application/json ContentType.
 type ProbeZapretJSONRequestBody = ZapretProbeInput
+
+// PutZapretStrategiesJSONRequestBody defines body for PutZapretStrategies for application/json ContentType.
+type PutZapretStrategiesJSONRequestBody = ZapretStrategies
 
 // TuneZapretJSONRequestBody defines body for TuneZapret for application/json ContentType.
 type TuneZapretJSONRequestBody = ZapretTuneInput
@@ -487,6 +500,12 @@ type ServerInterface interface {
 
 	// (POST /api/zapret/probe)
 	ProbeZapret(w http.ResponseWriter, r *http.Request)
+
+	// (GET /api/zapret/strategies)
+	GetZapretStrategies(w http.ResponseWriter, r *http.Request)
+
+	// (PUT /api/zapret/strategies)
+	PutZapretStrategies(w http.ResponseWriter, r *http.Request)
 
 	// (POST /api/zapret/tune)
 	TuneZapret(w http.ResponseWriter, r *http.Request)
@@ -628,6 +647,16 @@ func (_ Unimplemented) ManageZapret(w http.ResponseWriter, r *http.Request) {
 
 // (POST /api/zapret/probe)
 func (_ Unimplemented) ProbeZapret(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (GET /api/zapret/strategies)
+func (_ Unimplemented) GetZapretStrategies(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// (PUT /api/zapret/strategies)
+func (_ Unimplemented) PutZapretStrategies(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1114,6 +1143,34 @@ func (siw *ServerInterfaceWrapper) ProbeZapret(w http.ResponseWriter, r *http.Re
 	handler.ServeHTTP(w, r)
 }
 
+// GetZapretStrategies operation middleware
+func (siw *ServerInterfaceWrapper) GetZapretStrategies(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetZapretStrategies(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PutZapretStrategies operation middleware
+func (siw *ServerInterfaceWrapper) PutZapretStrategies(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PutZapretStrategies(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // TuneZapret operation middleware
 func (siw *ServerInterfaceWrapper) TuneZapret(w http.ResponseWriter, r *http.Request) {
 
@@ -1321,6 +1378,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/zapret/probe", wrapper.ProbeZapret)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/api/zapret/strategies", wrapper.GetZapretStrategies)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/api/zapret/strategies", wrapper.PutZapretStrategies)
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/api/zapret/tune", wrapper.TuneZapret)

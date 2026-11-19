@@ -704,6 +704,27 @@ select {
   font-size: 13px;
 }
 .device-summary > small { display: block; margin-top: 3px; }
+.device-addresses {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 4px 12px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+.device-addresses dt {
+  color: var(--muted);
+}
+.device-addresses dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-family: ui-monospace, monospace;
+}
+.device-addresses dd > span {
+  display: block;
+}
+.device-addresses dd.router-muted {
+  font-family: inherit;
+}
 .info-hint {
   display: inline-flex;
   vertical-align: middle;

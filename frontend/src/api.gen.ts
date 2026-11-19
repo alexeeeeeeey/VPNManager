@@ -324,6 +324,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/zapret/strategies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getZapretStrategies"];
+        put: operations["putZapretStrategies"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/zapret/tune": {
         parameters: {
             query?: never;
@@ -580,6 +596,12 @@ export interface components {
         };
         ZapretTuneInput: {
             targets: string[];
+            candidates?: components["schemas"]["ZapretStrategies"];
+        };
+        ZapretStrategies: components["schemas"]["ZapretStrategy"][];
+        ZapretStrategy: {
+            name: string;
+            args: string[];
         };
         ZapretTrial: {
             name: string;
@@ -1396,6 +1418,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ZapretStatus"];
+                };
+            };
+            /** @description Ошибка */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    getZapretStrategies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Свои стратегии */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZapretStrategies"];
+                };
+            };
+        };
+    };
+    putZapretStrategies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ZapretStrategies"];
+            };
+        };
+        responses: {
+            /** @description Сохранённые стратегии */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ZapretStrategies"];
                 };
             };
             /** @description Ошибка */

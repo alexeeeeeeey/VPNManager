@@ -27,11 +27,12 @@ const clients = computed(() => {
   ])
   return [...macs].sort().map((mac) => {
     const client = known.get(mac)
+    const addresses = client?.addresses ?? []
     return {
       mac,
-      addresses: client?.addresses ?? [],
+      ipv4: addresses.filter((address) => !address.includes(':')),
+      ipv6: addresses.filter((address) => address.includes(':')),
       hostname: client?.hostname,
-      profile: client?.profile,
       name: settings.value?.deviceNames?.[mac] ?? '',
       preset:
         settings.value?.presets.find((preset) => preset.macs.includes(mac))
@@ -116,10 +117,30 @@ const { mutate: save, isPending: saving } = useMutation({
     >
       <div class="device-summary">
         <strong>{{ client.name || client.hostname || client.mac }}</strong>
-        <p class="router-muted">
-          {{ client.name || client.hostname ? client.mac + ' · ' : ''
-          }}{{ client.addresses.join(', ') || 'Нет текущего IP' }}
-        </p>
+        <dl class="device-addresses">
+          <dt>MAC</dt>
+          <dd>{{ client.mac }}</dd>
+          <template v-if="client.ipv4.length">
+            <dt>IPv4</dt>
+            <dd>
+              <span v-for="address in client.ipv4" :key="address">{{
+                address
+              }}</span>
+            </dd>
+          </template>
+          <template v-if="client.ipv6.length">
+            <dt>IPv6</dt>
+            <dd>
+              <span v-for="address in client.ipv6" :key="address">{{
+                address
+              }}</span>
+            </dd>
+          </template>
+          <template v-if="!client.ipv4.length && !client.ipv6.length">
+            <dt>IP</dt>
+            <dd class="router-muted">Нет текущего IP</dd>
+          </template>
+        </dl>
         <small
           v-if="
             client.name && client.hostname && client.name !== client.hostname
@@ -127,9 +148,6 @@ const { mutate: save, isPending: saving } = useMutation({
         >
           Имя в сети · {{ client.hostname }}
         </small>
-        <small v-if="client.profile"
-          >Текущий маршрут · {{ client.profile }}</small
-        >
       </div>
       <div class="routing-fields">
         <label

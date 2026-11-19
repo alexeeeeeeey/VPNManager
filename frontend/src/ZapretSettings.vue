@@ -61,6 +61,7 @@ const dirty = computed(
 )
 const {
   mutate: save,
+  mutateAsync: saveAsync,
   isPending: saving,
   error,
 } = useMutation({
@@ -90,7 +91,11 @@ const {
     ui.notify(error.message, true)
   },
 })
-const { mutate: manage, isPending: managing } = useMutation({
+const {
+  mutate: manage,
+  mutateAsync: manageAsync,
+  isPending: managing,
+} = useMutation({
   mutationFn: async (action: 'install' | 'remove' | 'check') =>
     unwrap(await api.POST('/api/zapret', { body: { action } })),
   onSuccess(value, action) {
@@ -113,10 +118,7 @@ const lua = [
   '--lua-init=@{zapret}/lua/zapret-lib.lua',
   '--lua-init=@{zapret}/lua/zapret-antidpi.lua',
 ]
-const tls = [
-  '--filter-l7=tls',
-  '--payload=tls_client_hello',
-]
+const tls = ['--filter-l7=tls', '--payload=tls_client_hello']
 const upstreamHTTP = [
   '--filter-l7=http',
   '--payload=http_req',
@@ -137,19 +139,16 @@ function useTrial(trialArgs: string[]) {
   args.value = trialArgs.join('\n')
   ui.notify('Проверь параметры и нажми «Сохранить»')
 }
-const strategies = [
-  { name: 'TLS · Split', args: [...tls, '--lua-desync=multisplit:pos=2'] },
+const builtins = [
+  { name: 'Split', args: [...tls, '--lua-desync=multisplit:pos=2'] },
   {
-    name: 'TLS · Disorder',
+    name: 'Disorder',
     args: [...tls, '--lua-desync=multidisorder:pos=2'],
   },
   {
-    name: 'TLS · Fake',
+    name: 'Fake',
     args: [...tls, '--lua-desync=fake:blob=fake_default_tls:tcp_ts=-1000'],
   },
-  { name: 'Zapret2 · HTTP', args: upstreamHTTP },
-  { name: 'Zapret2 · TLS', args: upstreamTLS },
-  { name: 'Zapret2 · QUIC', args: upstreamQUIC },
   {
     name: 'Discord',
     args: [
@@ -164,6 +163,74 @@ const strategies = [
     ],
   },
 ]
+type Strategy = components['schemas']['ZapretStrategy']
+const {
+  data: customStrategies,
+  isPending: loadingStrategies,
+  isError: strategiesError,
+} = useQuery({
+  queryKey: ['zapret-strategies'],
+  queryFn: async () => unwrap(await api.GET('/api/zapret/strategies')),
+})
+const strategies = computed<Strategy[]>(() => [
+  ...builtins.map((item) => ({
+    name: item.name,
+    args: [...lua, ...item.args],
+  })),
+  ...(customStrategies.value ?? []),
+])
+const checkedNames = ref(builtins.map((item) => item.name))
+const candidates = computed(() =>
+  strategies.value.filter((item) => checkedNames.value.includes(item.name)),
+)
+const strategyName = ref('')
+function loadStrategy(item: Strategy) {
+  args.value = item.args.join('\n')
+  strategyName.value = builtins.some((preset) => preset.name === item.name)
+    ? ''
+    : item.name
+}
+const customName = computed(() => strategyName.value.trim())
+const reservedName = computed(() =>
+  [...builtins.map((item) => item.name), 'Без стратегии'].some(
+    (name) => name.toLowerCase() === customName.value.toLowerCase(),
+  ),
+)
+const existingStrategy = computed(() =>
+  customStrategies.value?.find(
+    (item) => item.name.toLowerCase() === customName.value.toLowerCase(),
+  ),
+)
+const { mutate: storeStrategy, isPending: storingStrategy } = useMutation({
+  mutationFn: async (remove: boolean) => {
+    const current = customStrategies.value ?? []
+    const existing = existingStrategy.value
+    const next = remove
+      ? current.filter((item) => item !== existing)
+      : existing
+        ? current.map((item) =>
+            item === existing
+              ? { name: item.name, args: lines(args.value) }
+              : item,
+          )
+        : [...current, { name: customName.value, args: lines(args.value) }]
+    return unwrap(await api.PUT('/api/zapret/strategies', { body: next }))
+  },
+  onSuccess(value, remove) {
+    query.setQueryData(['zapret-strategies'], value)
+    if (remove) {
+      checkedNames.value = checkedNames.value.filter((name) =>
+        strategies.value.some((item) => item.name === name),
+      )
+      strategyName.value = ''
+    }
+    ui.notify(remove ? 'Стратегия удалена' : 'Стратегия сохранена')
+  },
+  onError(error) {
+    ui.notify(error.message, true)
+  },
+})
+
 const tuningResult = ref<components['schemas']['ZapretTuneResult']>()
 const activeTrial = ref(-1)
 const selectedTrial = ref(0)
@@ -181,7 +248,10 @@ const {
     const response = await fetch('/api/zapret/tune?stream=1', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ targets: lines(targets.value) }),
+      body: JSON.stringify({
+        targets: lines(targets.value),
+        candidates: candidates.value,
+      }),
     })
     if (response.status === 401) window.location.replace('/login')
     if (!response.ok) throw new Error((await response.json()).message)
@@ -256,6 +326,38 @@ const {
         }),
     ),
 })
+const canApplyAndCheck = computed(
+  () =>
+    !saving.value &&
+    !managing.value &&
+    !storingStrategy.value &&
+    !tuning.value &&
+    !probing.value &&
+    !!(status.value?.installed || binary.value.trim()) &&
+    lines(args.value).length > 0,
+)
+const canStoreStrategy = computed(
+  () =>
+    !loadingStrategies.value &&
+    !strategiesError.value &&
+    !storingStrategy.value &&
+    !saving.value &&
+    !managing.value &&
+    !!customName.value &&
+    !reservedName.value &&
+    (!!existingStrategy.value || (customStrategies.value?.length ?? 0) < 8) &&
+    lines(args.value).length > 0,
+)
+
+async function applyAndCheck() {
+  if (!canApplyAndCheck.value) return
+  try {
+    if (dirty.value) await saveAsync()
+    await manageAsync('check')
+  } catch {
+    // Each mutation displays its own error.
+  }
+}
 </script>
 
 <template>
@@ -295,7 +397,8 @@ const {
       Включить Zapret2
     </button>
     <small v-if="data" class="router-muted">
-      Если Zapret2 выключен, срабатывает запасное действие пресета. Если оно тоже ZAPRET, соединение блокируется.
+      Если Zapret2 выключен, срабатывает запасное действие пресета. Если оно
+      тоже ZAPRET, соединение блокируется.
     </small>
     <small v-if="data && (!data.args.length || dirty)" class="router-muted">
       Сначала сохрани параметры стратегии.
@@ -363,7 +466,7 @@ const {
         <p class="inline-error">Не удалось загрузить настройки.</p>
         <button class="button" @click="refetch()">Повторить</button>
       </div>
-      <form v-else class="form" @submit.prevent="save()">
+      <form v-else class="form" @submit.prevent="applyAndCheck">
         <label
           >Путь
           <input
@@ -380,7 +483,7 @@ const {
             type="button"
             class="button"
             :disabled="saving || managing || tuning || !status?.installed"
-            @click="args = [...lua, ...item.args].join('\n')"
+            @click="loadStrategy(item)"
           >
             {{ item.name }}
           </button>
@@ -402,30 +505,98 @@ const {
             версии.</small
           >
         </label>
+        <section class="strategy-library" aria-label="Сохранение стратегии">
+          <label class="strategy-name">
+            Название стратегии
+            <input
+              v-model="strategyName"
+              placeholder="Например, Моя стратегия"
+              maxlength="80"
+              :disabled="
+                loadingStrategies || strategiesError || storingStrategy
+              "
+              @keydown.enter.prevent="canStoreStrategy && storeStrategy(false)"
+            />
+          </label>
+          <div class="actions">
+            <button
+              type="button"
+              class="button"
+              :disabled="!canStoreStrategy"
+              @click="storeStrategy(false)"
+            >
+              {{
+                storingStrategy
+                  ? 'Сохраняем…'
+                  : existingStrategy
+                    ? 'Обновить стратегию'
+                    : 'Сохранить стратегию'
+              }}
+            </button>
+            <button
+              v-if="existingStrategy"
+              type="button"
+              class="button destructive"
+              :disabled="storingStrategy || saving || managing"
+              @click="storeStrategy(true)"
+            >
+              Удалить
+            </button>
+          </div>
+        </section>
+        <div class="actions">
+          <button
+            type="submit"
+            class="button primary"
+            :disabled="!canApplyAndCheck"
+          >
+            {{
+              saving
+                ? 'Применяем…'
+                : managing
+                  ? 'Проверяем параметры…'
+                  : 'Применить и проверить'
+            }}
+          </button>
+        </div>
+        <p v-if="strategiesError" class="inline-error" role="alert">
+          Не удалось загрузить свои стратегии
+        </p>
         <p v-if="error" class="inline-error" role="alert">
           {{ error.message }}
         </p>
-        <div class="actions">
-          <button
-            class="button primary"
-            type="submit"
-            :disabled="saving || managing || tuning || !dirty"
-          >
-            {{ saving ? 'Применяем…' : 'Сохранить' }}
-          </button>
-          <button
-            class="button"
-            type="button"
-            :disabled="saving || managing || dirty || !status?.supported"
-            @click="manage('check')"
-          >
-            Проверить параметры
-          </button>
-        </div>
       </form>
     </section>
     <section class="panel settings-panel zapret-panel">
-      <h2>Подбор стратегии</h2>
+      <h2>
+        Подбор стратегии
+        <InfoHint
+          text="Сравнивает выбранные стратегии по ответам сайтов через HTTPS. Голос Discord и QUIC этим тестом не проверяются."
+        />
+      </h2>
+      <div class="actions" role="group" aria-label="Стратегии для проверки">
+        <button
+          v-for="item in strategies"
+          :key="item.name"
+          type="button"
+          class="button"
+          :class="{ primary: checkedNames.includes(item.name) }"
+          :aria-pressed="checkedNames.includes(item.name)"
+          :disabled="
+            tuning ||
+            probing ||
+            storingStrategy ||
+            (candidates.length >= 8 && !checkedNames.includes(item.name))
+          "
+          @click="
+            checkedNames = checkedNames.includes(item.name)
+              ? checkedNames.filter((name) => name !== item.name)
+              : [...checkedNames, item.name]
+          "
+        >
+          {{ item.name }}
+        </button>
+      </div>
       <label class="form">
         Домены для подбора и проверки
         <textarea
@@ -445,6 +616,7 @@ const {
             probing ||
             saving ||
             managing ||
+            !candidates.length ||
             lines(targets).length < 1 ||
             lines(targets).length > 5
           "
@@ -592,3 +764,20 @@ const {
     </div>
   </Modal>
 </template>
+
+<style scoped>
+.strategy-library {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 10px 14px;
+  padding: 12px;
+  border: 1px solid var(--edge);
+  border-radius: 10px;
+}
+
+.strategy-name {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+</style>

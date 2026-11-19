@@ -87,6 +87,9 @@ func (r *Runtime) RunZapretTrials(ctx context.Context, targets []string, trials 
 			return err
 		}
 		result := &trials[i+1]
+		if result.Error != "" {
+			continue
+		}
 		progress(i + 1)
 		if err := r.validateZapret(ctx, settings, queue); err != nil {
 			result.Error = err.Error()

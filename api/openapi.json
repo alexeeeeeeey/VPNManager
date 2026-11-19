@@ -841,6 +841,20 @@
         }
       }
     },
+    "/api/zapret/strategies": {
+      "get": {
+        "operationId": "getZapretStrategies",
+        "responses": {"200": {"description": "Свои стратегии", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ZapretStrategies"}}}}}
+      },
+      "put": {
+        "operationId": "putZapretStrategies",
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ZapretStrategies"}}}},
+        "responses": {
+          "200": {"description": "Сохранённые стратегии", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ZapretStrategies"}}}},
+          "default": {"description": "Ошибка", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      }
+    },
     "/api/zapret/tune": {
       "post": {
         "operationId": "tuneZapret",
@@ -1813,7 +1827,22 @@
       "ZapretTuneInput": {
         "type": "object",
         "required": ["targets"],
-        "properties": {"targets": {"type": "array", "items": {"type": "string"}}}
+        "properties": {
+          "targets": {"type": "array", "items": {"type": "string"}},
+          "candidates": {"$ref": "#/components/schemas/ZapretStrategies"}
+        }
+      },
+      "ZapretStrategies": {
+        "type": "array",
+        "items": {"$ref": "#/components/schemas/ZapretStrategy"}
+      },
+      "ZapretStrategy": {
+        "type": "object",
+        "required": ["name", "args"],
+        "properties": {
+          "name": {"type": "string"},
+          "args": {"type": "array", "items": {"type": "string"}}
+        }
       },
       "ZapretTrial": {
         "type": "object",
