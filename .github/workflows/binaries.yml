@@ -49,9 +49,6 @@ jobs:
           - darwin/arm64
           - freebsd/amd64
           - freebsd/arm64
-          - freebsd/386
-          - freebsd/arm
-          - netbsd/amd64
           - openbsd/amd64
           - openbsd/arm64
     steps:
