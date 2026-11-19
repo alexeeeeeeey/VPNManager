@@ -53,6 +53,9 @@ func loadConfig(path string, dev bool) (config, error) {
 		cfg.Engine.TProxy = false
 		return cfg, nil
 	}
+	if _, err := os.Stat("/etc/openwrt_release"); err == nil {
+		cfg.Listen = "0.0.0.0:9080"
+	}
 	data, err := os.ReadFile(path)
 	if err == nil {
 		if err = json.Unmarshal(data, &cfg); err != nil {

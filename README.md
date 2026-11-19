@@ -18,6 +18,10 @@ wget -O /tmp/vpn-manager-install.sh https://raw.githubusercontent.com/alexeeeeee
 
 Готовый пакет OpenWrt можно передать установщику напрямую, например `sh install.sh ./vpn-manager.ipk`. Для сборки пакета используйте workflow [OpenWrt package](.github/workflows/openwrt.yml).
 
+## Вход
+
+На OpenWrt откройте панель по LAN-адресу роутера, например [http://192.168.1.1:9080](http://192.168.1.1:9080). Логин и пароль выводятся при первой установке.
+
 ## Возможности
 
 - Импорт VPN-подписок, ссылок и JSON Xray, проверка задержки и обновление подписок.
