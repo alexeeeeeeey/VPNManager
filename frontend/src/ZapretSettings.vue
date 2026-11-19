@@ -114,12 +114,10 @@ const lua = [
   '--lua-init=@{zapret}/lua/zapret-antidpi.lua',
 ]
 const tls = [
-  '--filter-tcp=443',
   '--filter-l7=tls',
   '--payload=tls_client_hello',
 ]
 const upstreamHTTP = [
-  '--filter-tcp=80',
   '--filter-l7=http',
   '--payload=http_req',
   '--lua-desync=fake:blob=fake_default_http:tcp_md5',
@@ -131,7 +129,6 @@ const upstreamTLS = [
   '--lua-desync=multidisorder:pos=1,midsld',
 ]
 const upstreamQUIC = [
-  '--filter-udp=443',
   '--filter-l7=quic',
   '--payload=quic_initial',
   '--lua-desync=fake:blob=fake_default_quic:repeats=6',
@@ -154,8 +151,17 @@ const strategies = [
   { name: 'Zapret2 · TLS', args: upstreamTLS },
   { name: 'Zapret2 · QUIC', args: upstreamQUIC },
   {
-    name: 'Zapret2 · HTTP + TLS + QUIC',
-    args: [...upstreamHTTP, '--new', ...upstreamTLS, '--new', ...upstreamQUIC],
+    name: 'Discord',
+    args: [
+      ...upstreamHTTP,
+      '--new',
+      ...upstreamTLS,
+      '--new',
+      ...upstreamQUIC,
+      '--new',
+      '--payload=discord_ip_discovery',
+      '--lua-desync=fake:blob=0x00000000000000000000000000000000:repeats=2',
+    ],
   },
 ]
 const tuningResult = ref<components['schemas']['ZapretTuneResult']>()

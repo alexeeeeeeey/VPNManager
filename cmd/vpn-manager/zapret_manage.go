@@ -40,9 +40,19 @@ type zapretRelease struct {
 func defaultZapretSettings() api.ZapretSettings {
 	return api.ZapretSettings{Enabled: true, Args: []string{
 		"--lua-init=@{zapret}/lua/zapret-lib.lua", "--lua-init=@{zapret}/lua/zapret-antidpi.lua",
-		"--filter-tcp=443", "--filter-l7=tls", "--payload=tls_client_hello",
+		"--filter-l7=http", "--payload=http_req",
+		"--lua-desync=fake:blob=fake_default_http:tcp_md5",
+		"--lua-desync=multisplit:pos=method+2",
+		"--new",
+		"--filter-l7=tls", "--payload=tls_client_hello",
 		"--lua-desync=fake:blob=fake_default_tls:tcp_md5:tcp_seq=-10000",
 		"--lua-desync=multidisorder:pos=1,midsld",
+		"--new",
+		"--filter-l7=quic", "--payload=quic_initial",
+		"--lua-desync=fake:blob=fake_default_quic:repeats=6",
+		"--new",
+		"--payload=discord_ip_discovery",
+		"--lua-desync=fake:blob=0x00000000000000000000000000000000:repeats=2",
 	}}
 }
 

@@ -52,15 +52,31 @@ func (m *manager) routingSettings(ctx context.Context) (api.RoutingSettings, err
 		cfg.Presets = []api.RoutePreset{{
 			Name: name, Action: "VPN", Fallback: "ZAPRET", Macs: []string{}, Ips: []string{},
 			Rules: []api.RouteRule{
+				{Action: "DIRECT", Domains: []string{}, Ips: []string{}, Protocols: []string{"bittorrent"}},
 				{Action: "DIRECT", Domains: strings.Fields("domain:ru domain:xn--p1ai domain:su domain:2gis.com domain:vk.com domain:vkuseraudio.net domain:vkuser.net domain:yastatic.net domain:yandex.net domain:wildberries.net domain:wb.ru geosite:category-ru domain:ozonusercontent.com domain:gekai.net"), Ips: []string{}, Protocols: []string{}},
 				{Action: "DIRECT", Ips: []string{"geoip:ru"}, Domains: []string{}, Protocols: []string{}},
 			},
 		},
-			{Name: "Zapret2", Action: "ZAPRET", Fallback: "DIRECT", Macs: []string{}, Ips: []string{}, Rules: []api.RouteRule{}},
+			{Name: "Zapret2", Action: "DIRECT", Fallback: "DIRECT", Macs: []string{}, Ips: []string{}, Rules: defaultZapretRules()},
 			{Name: "Direct", Action: "DIRECT", Fallback: "DIRECT", Macs: []string{}, Ips: []string{}, Rules: []api.RouteRule{}},
 		}
 	}
 	return cfg, err
+}
+
+func defaultZapretRules() []api.RouteRule {
+	domains := []string{
+		"domain:youtube.com", "domain:youtu.be", "domain:youtube-nocookie.com",
+		"domain:googlevideo.com", "domain:ytimg.com", "domain:speedtest.net",
+		"domain:discord.com", "domain:discord.gg", "domain:discordapp.com",
+		"domain:discordapp.net", "domain:discord.media",
+	}
+	return []api.RouteRule{
+		{Action: "ZAPRET", Domains: []string{}, Ips: []string{"162.159.130.235/32"}, Protocols: []string{}, Network: "tcp", Ports: "2053"},
+		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "tcp", Ports: "80,443,2053"},
+		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "udp", Ports: "443"},
+		{Action: "ZAPRET", Domains: []string{}, Ips: []string{}, Protocols: []string{}, Network: "udp", Ports: "19294-19344,50000-50099"},
+	}
 }
 
 var validName = regexp.MustCompile(`^[^\p{C}]{1,80}$`)

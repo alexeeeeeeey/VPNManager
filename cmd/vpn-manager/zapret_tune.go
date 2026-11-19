@@ -55,7 +55,7 @@ func (s server) TuneZapret(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	prefix := []string{"--lua-init=@{zapret}/lua/zapret-lib.lua", "--lua-init=@{zapret}/lua/zapret-antidpi.lua",
-		"--filter-tcp=443", "--filter-l7=tls", "--payload=tls_client_hello"}
+		"--filter-l7=tls", "--payload=tls_client_hello"}
 	candidates := []api.ZapretTrial{
 		{Name: "TLS · Split", Args: []string{"--lua-desync=multisplit:pos=2"}},
 		{Name: "TLS · Disorder", Args: []string{"--lua-desync=multidisorder:pos=2"}},
