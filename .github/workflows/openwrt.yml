@@ -1,0 +1,90 @@
+name: OpenWrt package
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: OpenWrt release
+        default: '25.12.6'
+        required: true
+      target:
+        description: OpenWrt target/subtarget, for example x86/64 or armsr/armv8
+        default: 'x86/64'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+          run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm --dir frontend install --frozen-lockfile
+      - run: pnpm --dir frontend build
+      - run: sudo apt-get update && sudo apt-get install -y build-essential bzip2 ccache clang flex gawk gcc-multilib g++-multilib gettext libncurses-dev libssl-dev rsync unzip zstd
+      - name: Build package with OpenWrt SDK
+        env:
+          OPENWRT_RELEASE: ${{ inputs.release }}
+          OPENWRT_TARGET: ${{ inputs.target }}
+        run: |
+          set -euo pipefail
+          [[ "$OPENWRT_RELEASE" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]
+          [[ "$OPENWRT_TARGET" =~ ^[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$ ]]
+          base="https://downloads.openwrt.org/releases/$OPENWRT_RELEASE/targets/$OPENWRT_TARGET"
+          curl -fsSLo "$RUNNER_TEMP/sha256sums" "$base/sha256sums"
+          archive=$(awk '$2 ~ /^\*?openwrt-sdk-.*Linux-x86_64\.tar\.(zst|xz)$/ {sub(/^\*/, "", $2); print $2; exit}' "$RUNNER_TEMP/sha256sums")
+          test -n "$archive"
+          sdk="$RUNNER_TEMP/openwrt-sdk"
+          mkdir -p "$sdk"
+          curl -fsSLo "$RUNNER_TEMP/$archive" "$base/$archive"
+          (
+            cd "$RUNNER_TEMP"
+            awk -v name="$archive" '$2 == name || $2 == "*"name' sha256sums | sha256sum --check
+          )
+          tar -xf "$RUNNER_TEMP/$archive" --strip-components=1 -C "$sdk"
+          arch=
+          for toolchain in "$sdk"/staging_dir/toolchain-*; do
+            case "${toolchain##*/}" in
+              toolchain-x86_64_*) arch=amd64 ;;
+              toolchain-aarch64_*) arch=arm64 ;;
+            esac
+          done
+          test -n "$arch"
+          dest="$sdk/package/vpn-manager"
+          mkdir -p "$dest"
+          cp packaging/openwrt/{Makefile,vpn-manager.init} "$dest/"
+          version=0.1.0
+          if [[ "$GITHUB_REF_TYPE" == tag && "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          fi
+          printf '%s\n' "$version" > "$dest/VERSION"
+          GOOS=linux GOARCH="$arch" CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.buildVersion=$version" -o "$dest/vpn-manager" ./cmd/vpn-manager
+          (
+            cd "$sdk"
+            ./scripts/feeds update base packages
+            ./scripts/feeds install -p base ip-full nftables-json
+            ./scripts/feeds install -p packages conntrack
+            printf 'CONFIG_PACKAGE_vpn-manager=m\n' >> .config
+            make defconfig
+            PATH="$PWD/staging_dir/host/bin:$PATH" make -C package/vpn-manager TOPDIR="$PWD" SDK=1 V=s compile
+          )
+          mkdir -p dist/packages
+          find "$sdk/bin" -type f \( -name 'vpn-manager*.ipk' -o -name 'vpn-manager*.apk' \) -exec cp {} dist/packages/ \;
+          test -n "$(ls -A dist/packages)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openwrt-package
+          path: dist/packages/
+          if-no-files-found: error

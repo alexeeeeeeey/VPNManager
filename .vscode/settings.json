@@ -1,0 +1,8 @@
+{
+  "go.toolsEnvVars": {
+    "GOTOOLCHAIN": "go1.26.0"
+  },
+  "terminal.integrated.env.windows": {
+    "GOTOOLCHAIN": "go1.26.0"
+  }
+}

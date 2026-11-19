@@ -1,0 +1,1869 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "VPN Manager",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/status": {
+      "get": {
+        "operationId": "getStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/inventory": {
+      "get": {
+        "operationId": "getInventory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/import": {
+      "post": {
+        "operationId": "importProfiles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Input"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subscriptions/{id}/refresh": {
+      "post": {
+        "operationId": "refreshSubscription",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/subscriptions/{id}": {
+      "delete": {
+        "operationId": "deleteSubscription",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/profiles/{id}": {
+      "delete": {
+        "operationId": "deleteProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/profiles/{id}/config": {
+      "get": {
+        "operationId": "getConfig",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Config"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      },
+      "put": {
+        "operationId": "updateConfig",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Inventory"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Config"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/profiles/{id}/activate": {
+      "post": {
+        "operationId": "activateProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/api/probe": {
+      "post": {
+        "operationId": "probeProfiles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Probe"
+                  }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProbeRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/xray/restart": {
+      "post": {
+        "operationId": "restartXray",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/xray/profile": {
+      "delete": {
+        "operationId": "clearXrayProfile",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Status" }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/xray/stop": {
+      "post": {
+        "operationId": "stopXray",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/logs": {
+      "get": {
+        "operationId": "getLogs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Logs"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/router": {
+      "get": {
+        "operationId": "getRouterDashboard",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouterDashboard"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/router/external-check": {
+      "post": {
+        "operationId": "checkExternal",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExternalCheck"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/settings/dns": {
+      "get": {
+        "operationId": "getDNSSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DNSSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putDNSSettings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DNSSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DNSSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/settings/zapret": {
+      "get": {
+        "operationId": "getZapretSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZapretSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putZapretSettings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZapretSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZapretSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/update": {
+      "get": {
+        "operationId": "getPanelUpdate",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PanelUpdate"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "installPanelUpdate",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallUpdate"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/settings/routing": {
+      "get": {
+        "operationId": "getRoutingSettings",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutingSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "putRoutingSettings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RoutingSettings"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutingSettings"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/zapret": {
+      "get": {
+        "operationId": "getZapretStatus",
+        "parameters": [
+          {
+            "name": "check",
+            "in": "query",
+            "schema": { "type": "boolean" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZapretStatus"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "operationId": "manageZapret",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZapretStatus"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZapretAction"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/zapret/tune": {
+      "post": {
+        "operationId": "tuneZapret",
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ZapretTuneInput"}}}
+        },
+        "responses": {
+          "200": {
+            "description": "Результаты подбора",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ZapretTuneResult"}}}
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}
+          }
+        }
+      }
+    },
+    "/api/zapret/probe": {
+      "post": {
+        "operationId": "probeZapret",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ZapretProbe"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Ошибка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ZapretProbeInput"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Input": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "input": {
+            "type": "string"
+          },
+          "refreshHours": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "input",
+          "refreshHours"
+        ]
+      },
+      "Profile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind",
+          "host",
+          "sourceId",
+          "available"
+        ]
+      },
+      "Subscription": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "refreshHours": {
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "refreshHours",
+          "updatedAt",
+          "error"
+        ]
+      },
+      "Inventory": {
+        "type": "object",
+        "properties": {
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Profile"
+            }
+          },
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subscription"
+            }
+          }
+        },
+        "required": [
+          "profiles",
+          "subscriptions"
+        ]
+      },
+      "Status": {
+        "type": "object",
+        "properties": {
+          "hostname": {
+            "type": "string"
+          },
+          "uptime": {
+            "type": "integer"
+          },
+          "cpu": {
+            "type": "integer"
+          },
+          "memoryUsed": {
+            "type": "integer"
+          },
+          "memoryTotal": {
+            "type": "integer"
+          },
+          "rxBytes": {
+            "type": "integer"
+          },
+          "txBytes": {
+            "type": "integer"
+          },
+          "xrayRxBytes": {
+            "type": "integer"
+          },
+          "xrayTxBytes": {
+            "type": "integer"
+          },
+          "xray": {
+            "type": "string"
+          },
+          "xrayEnabled": {
+            "type": "boolean"
+          },
+          "activeId": {
+            "type": "string"
+          },
+          "restarts": {
+            "type": "integer"
+          },
+          "tproxy": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "sampledAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hostname",
+          "uptime",
+          "cpu",
+          "memoryUsed",
+          "memoryTotal",
+          "rxBytes",
+          "txBytes",
+          "xrayRxBytes",
+          "xrayTxBytes",
+          "xray",
+          "xrayEnabled",
+          "activeId",
+          "restarts",
+          "tproxy",
+          "message"
+        ]
+      },
+      "Probe": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "latency": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "latency",
+          "error"
+        ]
+      },
+      "ProbeRequest": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "Config": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "input"
+        ]
+      },
+      "Logs": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "lines"
+        ]
+      },
+      "Storage": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "free": {
+            "type": "integer"
+          },
+          "available": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "path",
+          "total",
+          "free",
+          "available"
+        ]
+      },
+      "RouterOutbound": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "type": "string"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "rx": {
+            "type": "integer"
+          },
+          "tx": {
+            "type": "integer"
+          },
+          "observedConnections": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "tag",
+          "protocol",
+          "address",
+          "category",
+          "rx",
+          "tx",
+          "observedConnections"
+        ]
+      },
+      "RouterEvent": {
+        "type": "object",
+        "properties": {
+          "at": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "kind",
+          "message"
+        ]
+      },
+      "RouterHealth": {
+        "type": "object",
+        "properties": {
+          "checkedAt": {
+            "type": "string"
+          },
+          "rtt": {
+            "type": "integer"
+          },
+          "samples": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "checkedAt",
+          "rtt",
+          "samples",
+          "failed",
+          "error"
+        ]
+      },
+      "RouterClient": {
+        "type": "object",
+        "properties": {
+          "alias": {
+            "type": "string"
+          },
+          "hostname": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          },
+          "addresses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "profile": {
+            "type": "string"
+          },
+          "rx": {
+            "type": "integer"
+          },
+          "tx": {
+            "type": "integer"
+          },
+          "bytesPerSecond": {
+            "type": "number"
+          },
+          "accounted": {
+            "type": "boolean"
+          },
+          "sessions": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mac",
+          "addresses",
+          "profile",
+          "rx",
+          "tx",
+          "bytesPerSecond",
+          "accounted",
+          "sessions"
+        ]
+      },
+      "RouterDestination": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "sessions": {
+            "type": "integer"
+          },
+          "bytes": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "address",
+          "sessions",
+          "bytes"
+        ]
+      },
+      "RouterConnections": {
+        "type": "object",
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "accounting": {
+            "type": "boolean"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
+          "tcp": {
+            "type": "integer"
+          },
+          "udp": {
+            "type": "integer"
+          },
+          "newPerSecond": {
+            "type": "number"
+          },
+          "destinations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouterDestination"
+            }
+          }
+        },
+        "required": [
+          "available",
+          "accounting",
+          "truncated",
+          "tcp",
+          "udp",
+          "newPerSecond",
+          "destinations"
+        ]
+      },
+      "RouterDashboard": {
+        "type": "object",
+        "properties": {
+          "sampledAt": {
+            "type": "string"
+          },
+          "storage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Storage"
+            }
+          },
+          "health": {
+            "$ref": "#/components/schemas/RouterHealth"
+          },
+          "appliedAt": {
+            "type": "string"
+          },
+          "reconnectedAt": {
+            "type": "string"
+          },
+          "reconnects": {
+            "type": "integer"
+          },
+          "crashes": {
+            "type": "integer"
+          },
+          "outbounds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouterOutbound"
+            }
+          },
+          "routingRules": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "statsAvailable": {
+            "type": "boolean"
+          },
+          "clientsAvailable": {
+            "type": "boolean"
+          },
+          "clients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouterClient"
+            }
+          },
+          "connections": {
+            "$ref": "#/components/schemas/RouterConnections"
+          },
+          "dnsServers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouterEvent"
+            }
+          },
+          "icmp": {
+            "$ref": "#/components/schemas/RouterIcmp"
+          },
+          "forwarded": {
+            "$ref": "#/components/schemas/RouterForwarded"
+          }
+        },
+        "required": [
+          "sampledAt",
+          "storage",
+          "health",
+          "appliedAt",
+          "reconnectedAt",
+          "reconnects",
+          "crashes",
+          "outbounds",
+          "routingRules",
+          "statsAvailable",
+          "clientsAvailable",
+          "clients",
+          "connections",
+          "dnsServers",
+          "events",
+          "icmp",
+          "forwarded"
+        ]
+      },
+      "ExternalRoute": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "type": "string"
+          },
+          "family": {
+            "type": "integer"
+          },
+          "ip": {
+            "type": "string"
+          },
+          "asn": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "latency": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "geoError": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "mode",
+          "family",
+          "ip",
+          "asn",
+          "country",
+          "latency",
+          "error",
+          "geoError"
+        ]
+      },
+      "ExternalCheck": {
+        "type": "object",
+        "properties": {
+          "checkedAt": {
+            "type": "string"
+          },
+          "routes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExternalRoute"
+            }
+          }
+        },
+        "required": [
+          "checkedAt",
+          "routes"
+        ]
+      },
+      "RouterIcmp": {
+        "type": "object",
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "checkedAt": {
+            "type": "string"
+          },
+          "rtt": {
+            "type": "number"
+          },
+          "loss": {
+            "type": "number"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "address",
+          "checkedAt",
+          "rtt",
+          "loss",
+          "available",
+          "error"
+        ]
+      },
+      "RouterForwarded": {
+        "type": "object",
+        "properties": {
+          "rx": {
+            "type": "integer"
+          },
+          "tx": {
+            "type": "integer"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "rx",
+          "tx",
+          "available"
+        ]
+      },
+      "DNSSettings": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "listenPort": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 65535
+          },
+          "stages": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "enum": [
+                "xray",
+                "doh",
+                "direct"
+              ]
+            }
+          },
+          "doh": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "string"
+            }
+          },
+          "direct": {
+            "type": "array",
+            "maxItems": 4,
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "listenPort",
+          "stages",
+          "doh",
+          "direct"
+        ]
+      },
+      "ZapretSettings": {
+        "type": "object",
+        "properties": {
+          "binary": {
+            "type": "string"
+          },
+          "args": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "binary",
+          "args",
+          "enabled"
+        ]
+      },
+      "PanelUpdate": {
+        "type": "object",
+        "properties": {
+          "current": {
+            "type": "string"
+          },
+          "latest": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "current",
+          "latest",
+          "available"
+        ]
+      },
+      "InstallUpdate": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "version"
+        ]
+      },
+      "RouteRule": {
+        "type": "object",
+        "properties": {
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ips": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ports": {
+            "type": "string"
+          },
+          "network": {
+            "type": "string"
+          },
+          "protocols": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "action": {
+            "type": "string"
+          },
+          "outboundTag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "domains",
+          "ips",
+          "ports",
+          "network",
+          "protocols",
+          "action",
+          "outboundTag"
+        ]
+      },
+      "RoutePreset": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "macs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ips": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "profileId": {
+            "type": "string"
+          },
+          "outboundTag": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "fallback": {
+            "type": "string"
+          },
+          "rules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteRule"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "macs",
+          "ips",
+          "profileId",
+          "outboundTag",
+          "action",
+          "fallback",
+          "rules"
+        ]
+      },
+      "RoutingSettings": {
+        "type": "object",
+        "properties": {
+          "defaultPreset": {
+            "type": "string"
+          },
+          "deviceNames": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          },
+          "presets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoutePreset"
+            }
+          },
+          "queue": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "presets",
+          "queue"
+        ]
+      },
+      "ZapretStatus": {
+        "type": "object",
+        "properties": {
+          "binaryPath": {"type": "string"},
+          "supported": {
+            "type": "boolean"
+          },
+          "installed": {
+            "type": "string"
+          },
+          "latest": {
+            "type": "string"
+          },
+          "running": {
+            "type": "boolean"
+          },
+          "updateAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "supported",
+          "installed",
+          "latest",
+          "running",
+          "updateAvailable"
+        ]
+      },
+      "ZapretAction": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "install",
+              "remove",
+              "check"
+            ]
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "ZapretTuneInput": {
+        "type": "object",
+        "required": ["targets"],
+        "properties": {"targets": {"type": "array", "items": {"type": "string"}}}
+      },
+      "ZapretTrial": {
+        "type": "object",
+        "required": ["name", "args", "statuses", "error"],
+        "properties": {
+          "name": {"type": "string"},
+          "args": {"type": "array", "items": {"type": "string"}},
+          "statuses": {"type": "array", "items": {"type": "integer"}},
+          "error": {"type": "string"}
+        }
+      },
+      "ZapretTuneResult": {
+        "type": "object",
+        "required": ["targets", "trials", "best"],
+        "properties": {
+          "targets": {"type": "array", "items": {"type": "string"}},
+          "trials": {"type": "array", "items": {"$ref": "#/components/schemas/ZapretTrial"}},
+          "best": {"type": "integer"}
+        }
+      },
+      "ZapretProbe": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "latency": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "url",
+          "latency",
+          "status"
+        ]
+      },
+      "ZapretProbeInput": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    }
+  }
+}

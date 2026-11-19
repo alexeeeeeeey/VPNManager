@@ -1,0 +1,13 @@
+[Unit]
+Description=VPN Manager
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/vpn-manager -config /etc/vpn-manager/config.json -managed-update
+Restart=always
+RestartSec=5
+Environment=GOGC=50 GOMEMLIMIT=32MiB XRAY_LOCATION_ASSET=/usr/share/xray
+
+[Install]
+WantedBy=multi-user.target

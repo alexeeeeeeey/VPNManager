@@ -1,0 +1,27 @@
+version: 2
+project_name: vpn-manager
+
+builds:
+  - binary: vpn-manager
+    main: ./cmd/vpn-manager
+    env: [CGO_ENABLED=0]
+    goos: [linux]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags: ["-s -w -X main.buildVersion={{.Version}}"]
+
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - README.md
+      - packaging/openwrt/*
+      - packaging/systemd/*
+      - install.sh
+      - uninstall.sh
+
+checksum:
+  name_template: checksums.txt
+
+changelog:
+  use: git
