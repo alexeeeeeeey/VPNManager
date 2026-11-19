@@ -72,7 +72,6 @@ func defaultZapretRules() []api.RouteRule {
 		"domain:discordapp.net", "domain:discord.media",
 	}
 	return []api.RouteRule{
-		{Action: "ZAPRET", Domains: []string{}, Ips: []string{"162.159.130.235/32"}, Protocols: []string{}, Network: "tcp", Ports: "2053"},
 		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "tcp", Ports: "80,443,2053"},
 		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "udp", Ports: "443"},
 		{Action: "ZAPRET", Domains: []string{}, Ips: []string{}, Protocols: []string{}, Network: "udp", Ports: "19294-19344,50000-50099"},
