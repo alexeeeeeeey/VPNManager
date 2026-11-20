@@ -126,7 +126,7 @@ func (m *manager) runAutoUpdates(ctx context.Context, cfg autoUpdateSettings) {
 	}
 	update, cancel := context.WithTimeout(ctx, 2*time.Minute)
 	defer cancel()
-	status := u.status(update)
+	status := u.status(update, false)
 	if !status.Available {
 		return
 	}

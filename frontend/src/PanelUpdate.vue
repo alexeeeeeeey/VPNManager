@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useMutation, useQuery } from '@tanstack/vue-query'
-import { Download } from 'lucide-vue-next'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { Download, RefreshCw } from 'lucide-vue-next'
 import { api, unwrap, useUI } from './client'
 import Modal from './Modal.vue'
 
 const ui = useUI()
+const query = useQueryClient()
+const updateKey = ['panel-update']
 const open = ref(false)
 const restarting = ref(false)
 const { data: update } = useQuery({
-  queryKey: ['panel-update'],
+  queryKey: updateKey,
   queryFn: async () => unwrap(await api.GET('/api/update')),
   staleTime: 10 * 60_000,
   refetchInterval: 10 * 60_000,
@@ -46,6 +48,25 @@ const {
   },
 })
 
+const { mutate: check, isPending: checking } = useMutation({
+  mutationFn: async () =>
+    unwrap(
+      await api.GET('/api/update', { params: { query: { check: true } } }),
+    ),
+  async onMutate() {
+    await query.cancelQueries({ queryKey: updateKey })
+  },
+  onSuccess(value) {
+    query.setQueryData(updateKey, value)
+    if (value.available) ui.notify('Доступна версия ' + value.latest)
+    else if (value.latest) ui.notify('Доступных обновлений нет')
+    else ui.notify('Не удалось получить список релизов', true)
+  },
+  onError(error) {
+    ui.notify(error.message, true)
+  },
+})
+
 function confirm() {
   reset()
   open.value = true
@@ -53,6 +74,16 @@ function confirm() {
 </script>
 
 <template>
+  <span v-if="update" class="chip">Версия {{ update.current }}</span>
+  <button
+    class="button"
+    type="button"
+    :disabled="checking || isPending || restarting"
+    @click="check()"
+  >
+    <RefreshCw :size="16" />
+    {{ checking ? 'Проверяем…' : 'Проверить обновления' }}
+  </button>
   <button
     v-if="update?.available"
     class="button primary"

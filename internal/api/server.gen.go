@@ -379,6 +379,11 @@ type ZapretTuneResult struct {
 	Trials  []ZapretTrial `json:"trials"`
 }
 
+// GetPanelUpdateParams defines parameters for GetPanelUpdate.
+type GetPanelUpdateParams struct {
+	Check *bool `form:"check,omitempty" json:"check,omitempty"`
+}
+
 // GetZapretStatusParams defines parameters for GetZapretStatus.
 type GetZapretStatusParams struct {
 	Check *bool `form:"check,omitempty" json:"check,omitempty"`
@@ -478,7 +483,7 @@ type ServerInterface interface {
 	RefreshSubscription(w http.ResponseWriter, r *http.Request, id string)
 
 	// (GET /api/update)
-	GetPanelUpdate(w http.ResponseWriter, r *http.Request)
+	GetPanelUpdate(w http.ResponseWriter, r *http.Request, params GetPanelUpdateParams)
 
 	// (POST /api/update)
 	InstallPanelUpdate(w http.ResponseWriter, r *http.Request)
@@ -611,7 +616,7 @@ func (_ Unimplemented) RefreshSubscription(w http.ResponseWriter, r *http.Reques
 }
 
 // (GET /api/update)
-func (_ Unimplemented) GetPanelUpdate(w http.ResponseWriter, r *http.Request) {
+func (_ Unimplemented) GetPanelUpdate(w http.ResponseWriter, r *http.Request, params GetPanelUpdateParams) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1015,8 +1020,27 @@ func (siw *ServerInterfaceWrapper) RefreshSubscription(w http.ResponseWriter, r 
 // GetPanelUpdate operation middleware
 func (siw *ServerInterfaceWrapper) GetPanelUpdate(w http.ResponseWriter, r *http.Request) {
 
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPanelUpdateParams
+
+	// ------------- Optional query parameter "check" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "check", r.URL.Query(), &params.Check, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "check"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "check", Err: err})
+		}
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.GetPanelUpdate(w, r)
+		siw.Handler.GetPanelUpdate(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {

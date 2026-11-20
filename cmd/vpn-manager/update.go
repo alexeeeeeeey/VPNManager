@@ -59,14 +59,14 @@ func releaseVersion(value string) string {
 	return strings.TrimPrefix(value, "v")
 }
 
-func (u *panelUpdater) status(ctx context.Context) api.PanelUpdate {
+func (u *panelUpdater) status(ctx context.Context, force bool) api.PanelUpdate {
 	result := api.PanelUpdate{Current: buildVersion}
 	if u.executable == "" || releaseVersion(buildVersion) == "" {
 		return result
 	}
 	u.checks.Lock()
 	defer u.checks.Unlock()
-	if time.Now().Before(u.expires) {
+	if !force && time.Now().Before(u.expires) {
 		return u.cached
 	}
 	result = u.lookup(ctx)
@@ -269,8 +269,8 @@ func preserveExecutable(path string, mode os.FileMode) error {
 	return os.Rename(copyFile.Name(), path+".previous")
 }
 
-func (s server) GetPanelUpdate(w http.ResponseWriter, r *http.Request) {
-	jsonResponse(w, s.updater.status(r.Context()), nil)
+func (s server) GetPanelUpdate(w http.ResponseWriter, r *http.Request, params api.GetPanelUpdateParams) {
+	jsonResponse(w, s.updater.status(r.Context(), params.Check != nil && *params.Check), nil)
 }
 
 func (s server) InstallPanelUpdate(w http.ResponseWriter, r *http.Request) {
@@ -284,7 +284,7 @@ func (s server) InstallPanelUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer u.installing.Unlock()
-	update := u.status(r.Context())
+	update := u.status(r.Context(), false)
 	if !update.Available || input.Version != update.Latest {
 		jsonResponse(w, nil, errors.New("совместимое обновление недоступно"))
 		return

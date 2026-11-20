@@ -1245,7 +1245,9 @@ export interface operations {
     };
     getPanelUpdate: {
         parameters: {
-            query?: never;
+            query?: {
+                check?: boolean;
+            };
             header?: never;
             path?: never;
             cookie?: never;

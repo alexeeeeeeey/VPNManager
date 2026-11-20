@@ -651,6 +651,9 @@
     "/api/update": {
       "get": {
         "operationId": "getPanelUpdate",
+        "parameters": [
+          {"name": "check", "in": "query", "schema": {"type": "boolean"}}
+        ],
         "responses": {
           "200": {
             "description": "OK",
