@@ -65,12 +65,7 @@ func (m *manager) routingSettings(ctx context.Context) (api.RoutingSettings, err
 }
 
 func defaultZapretRules() []api.RouteRule {
-	domains := []string{
-		"domain:youtube.com", "domain:youtu.be", "domain:youtube-nocookie.com",
-		"domain:googlevideo.com", "domain:ytimg.com", "domain:speedtest.net",
-		"domain:discord.com", "domain:discord.gg", "domain:discordapp.com",
-		"domain:discordapp.net", "domain:discord.media",
-	}
+	domains := []string{"geosite:discord", "geosite:speedtest", "geosite:youtube"}
 	return []api.RouteRule{
 		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "tcp", Ports: "80,443,2053"},
 		{Action: "ZAPRET", Domains: domains, Ips: []string{}, Protocols: []string{}, Network: "udp", Ports: "443"},
